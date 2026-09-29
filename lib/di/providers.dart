@@ -222,20 +222,33 @@ class ExpensesController extends _$ExpensesController {
 
   Future<Result<int>> add(ExpenseEntry entry) async {
     final result = await ref.read(addExpenseUseCaseProvider)(entry);
-    if (result.isOk) ref.invalidateSelf();
+    if (result.isOk) {
+      ref.invalidateSelf();
+      // Invalidate the family (no args) to refresh every month's summary.
+      // This is the single point where "expenses changed" is turned into
+      // "summary must reload" — not a watch, not a listener.
+      ref.invalidate(monthlySummaryProvider);
+    }
     return result;
   }
 
   Future<Result<void>> delete(int id) async {
     final result = await ref.read(deleteExpenseUseCaseProvider)(id);
-    if (result.isOk) ref.invalidateSelf();
+    if (result.isOk) {
+      ref.invalidateSelf();
+      ref.invalidate(monthlySummaryProvider);
+    }
     return result;
   }
 }
 
+/// Reads the monthly summary. Does NOT watch `expensesControllerProvider` —
+/// that would re-run the SQL query on every state transition of the
+/// expenses list (including the initial loading -> data), which keeps the
+/// summary permanently at `loading`. Instead, `ExpensesController` calls
+/// `ref.invalidate(monthlySummaryProvider)` after successful mutations.
 @riverpod
 Future<MonthlySummary> monthlySummary(Ref ref, DateTime month) async {
-  ref.watch(expensesControllerProvider);
   final result = await ref.read(getMonthlySummaryUseCaseProvider)(month);
   return result.getOrThrow();
 }

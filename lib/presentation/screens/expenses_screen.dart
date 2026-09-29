@@ -12,8 +12,17 @@ class ExpensesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final expensesAsync = ref.watch(expensesControllerProvider);
+
+    // Stable family key: first day of the current month. Every call to
+    // DateTime(now.year, now.month) produces an ==-equal DateTime, so the
+    // family has exactly one live instance per month instead of one per
+    // rebuild. Using raw DateTime.now() as a family key creates a new
+    // provider instance on every frame, and none of them ever resolve.
     final now = DateTime.now();
-    final summaryAsync = ref.watch(monthlySummaryProvider(now));
+    final monthKey = DateTime(now.year, now.month);
+    final summaryAsync = ref.watch(monthlySummaryProvider(monthKey));
+
+    final currencyCode = ref.watch(settingsControllerProvider).currencyCode;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Expenses')),
@@ -22,45 +31,57 @@ class ExpensesScreen extends ConsumerWidget {
         icon: const Icon(Icons.add),
         label: const Text('Add'),
       ),
-      body: RefreshIndicator(
-        onRefresh: () async => ref.invalidate(expensesControllerProvider),
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: 96),
-          children: [
-            summaryAsync.when(
-              loading: () => const SizedBox(
-                height: 120,
-                child: Center(child: CircularProgressIndicator()),
-              ),
-              error: (_, __) => const SizedBox.shrink(),
-              data: (summary) => _SummaryCard(
-                summary: summary,
-                currencyCode: ref
-                    .watch(settingsControllerProvider)
-                    .currencyCode,
-              ),
-            ),
-            expensesAsync.when(
-              loading: () => const Padding(
-                padding: EdgeInsets.symmetric(vertical: 48),
-                child: Center(child: CircularProgressIndicator()),
-              ),
-              error: (err, _) => Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text('$err', textAlign: TextAlign.center),
-              ),
-              data: (expenses) {
-                if (expenses.isEmpty) {
-                  return const Padding(
+      body: switch ((expensesAsync, summaryAsync)) {
+        // While either is loading, show one spinner for the whole screen.
+        (AsyncLoading(), _) ||
+        (_, AsyncLoading()) => const Center(child: CircularProgressIndicator()),
+
+        // Either failing takes over the whole screen — no half-rendered
+        // summary with a broken list, or vice versa.
+        (AsyncError(:final error), _) => _ErrorPanel(error: error),
+        (_, AsyncError(:final error)) => _ErrorPanel(error: error),
+
+        // Both ready — render the real screen.
+        (AsyncData(value: final expenses), AsyncData(value: final summary)) =>
+          RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(expensesControllerProvider);
+              ref.invalidate(monthlySummaryProvider);
+            },
+            child: ListView(
+              padding: const EdgeInsets.only(bottom: 96),
+              children: [
+                _SummaryCard(summary: summary, currencyCode: currencyCode),
+                if (expenses.isEmpty)
+                  const Padding(
                     padding: EdgeInsets.symmetric(vertical: 48),
                     child: Center(child: Text('No expenses recorded yet.')),
-                  );
-                }
-                return Column(
-                  children: [for (final e in expenses) _ExpenseTile(entry: e)],
-                );
-              },
+                  )
+                else
+                  for (final e in expenses) _ExpenseTile(entry: e),
+              ],
             ),
+          ),
+      },
+    );
+  }
+}
+
+class _ErrorPanel extends StatelessWidget {
+  final Object error;
+  const _ErrorPanel({required this.error});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.error_outline, size: 48),
+            const SizedBox(height: 12),
+            Text('$error', textAlign: TextAlign.center),
           ],
         ),
       ),

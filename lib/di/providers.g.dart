@@ -20,7 +20,7 @@ final class DioClientProvider extends $FunctionalProvider<Dio, Dio, Dio>
         argument: null,
         retry: null,
         name: r'dioClientProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -47,7 +47,7 @@ final class DioClientProvider extends $FunctionalProvider<Dio, Dio, Dio>
   }
 }
 
-String _$dioClientHash() => r'ee6dac4661acb6e620b6651d532d6a6c36dfce44';
+String _$dioClientHash() => r'b8f002e25e41597fda9b05fea6252498e5028f57';
 
 @ProviderFor(apiClient)
 final apiClientProvider = ApiClientProvider._();
@@ -61,7 +61,7 @@ final class ApiClientProvider
         argument: null,
         retry: null,
         name: r'apiClientProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -88,7 +88,7 @@ final class ApiClientProvider
   }
 }
 
-String _$apiClientHash() => r'31a51a0989ba59491e9fbec128c864407107045e';
+String _$apiClientHash() => r'4924497dc300ac1aff6afcf623f157adbc350756';
 
 @ProviderFor(secureStorage)
 final secureStorageProvider = SecureStorageProvider._();
@@ -107,7 +107,7 @@ final class SecureStorageProvider
         argument: null,
         retry: null,
         name: r'secureStorageProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -135,7 +135,7 @@ final class SecureStorageProvider
   }
 }
 
-String _$secureStorageHash() => r'5f0f1e7075cbfc89c9f88bceffd63f21bf812b87';
+String _$secureStorageHash() => r'0cd1b80f91784467390034386f925a0be155bfbd';
 
 @ProviderFor(tokenStore)
 final tokenStoreProvider = TokenStoreProvider._();
@@ -149,7 +149,7 @@ final class TokenStoreProvider
         argument: null,
         retry: null,
         name: r'tokenStoreProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -176,7 +176,7 @@ final class TokenStoreProvider
   }
 }
 
-String _$tokenStoreHash() => r'f219c54cbe8397f0c7ffb97fd3452b9450715c28';
+String _$tokenStoreHash() => r'a2110b12d09311f3c7b8da6c5ceb849ba3a02542';
 
 @ProviderFor(settingsStore)
 final settingsStoreProvider = SettingsStoreProvider._();
@@ -190,7 +190,7 @@ final class SettingsStoreProvider
         argument: null,
         retry: null,
         name: r'settingsStoreProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -217,7 +217,7 @@ final class SettingsStoreProvider
   }
 }
 
-String _$settingsStoreHash() => r'e308abbab842e713389d7106c62724c055005977';
+String _$settingsStoreHash() => r'e5786f9f681807cc2238d355a14fe40e049dc11d';
 
 @ProviderFor(catalogCache)
 final catalogCacheProvider = CatalogCacheProvider._();
@@ -231,7 +231,7 @@ final class CatalogCacheProvider
         argument: null,
         retry: null,
         name: r'catalogCacheProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -258,7 +258,7 @@ final class CatalogCacheProvider
   }
 }
 
-String _$catalogCacheHash() => r'0b443736a7ad4432d879ff150cbc02e6bac7466f';
+String _$catalogCacheHash() => r'76ce91f339063c6018eab0ac571e495381e270a4';
 
 @ProviderFor(expenseDao)
 final expenseDaoProvider = ExpenseDaoProvider._();
@@ -272,7 +272,7 @@ final class ExpenseDaoProvider
         argument: null,
         retry: null,
         name: r'expenseDaoProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -299,7 +299,7 @@ final class ExpenseDaoProvider
   }
 }
 
-String _$expenseDaoHash() => r'8ac34c5008a571e70301e87b60dbf1b30d0b0485';
+String _$expenseDaoHash() => r'9d6fbce25ce54284bdab0b59e4bde3aab5a961b9';
 
 @ProviderFor(authRepository)
 final authRepositoryProvider = AuthRepositoryProvider._();
@@ -313,7 +313,7 @@ final class AuthRepositoryProvider
         argument: null,
         retry: null,
         name: r'authRepositoryProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -340,7 +340,7 @@ final class AuthRepositoryProvider
   }
 }
 
-String _$authRepositoryHash() => r'02850302fe0a2322a095565235f02948500f88c0';
+String _$authRepositoryHash() => r'e2a4f70338ab8ea5458e762cb38fd8d9526eccb6';
 
 @ProviderFor(catalogRepository)
 final catalogRepositoryProvider = CatalogRepositoryProvider._();
@@ -359,7 +359,7 @@ final class CatalogRepositoryProvider
         argument: null,
         retry: null,
         name: r'catalogRepositoryProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -387,7 +387,7 @@ final class CatalogRepositoryProvider
   }
 }
 
-String _$catalogRepositoryHash() => r'bf29e1d288ab03f78a41d03af1adf902abd5ba3e';
+String _$catalogRepositoryHash() => r'f4e40f6b3e2371ee1a76fe19069b92b33c45147c';
 
 @ProviderFor(expenseRepository)
 final expenseRepositoryProvider = ExpenseRepositoryProvider._();
@@ -406,7 +406,7 @@ final class ExpenseRepositoryProvider
         argument: null,
         retry: null,
         name: r'expenseRepositoryProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -434,7 +434,7 @@ final class ExpenseRepositoryProvider
   }
 }
 
-String _$expenseRepositoryHash() => r'7e2710ef4a0a1732e0c88760a95096456a407cc9';
+String _$expenseRepositoryHash() => r'ecb15d0dc07c005cba921e0c1556bfe813ed61d4';
 
 @ProviderFor(settingsRepository)
 final settingsRepositoryProvider = SettingsRepositoryProvider._();
@@ -453,7 +453,7 @@ final class SettingsRepositoryProvider
         argument: null,
         retry: null,
         name: r'settingsRepositoryProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -482,7 +482,7 @@ final class SettingsRepositoryProvider
 }
 
 String _$settingsRepositoryHash() =>
-    r'246c6c6e143f2ee70abaf3964e070ecef7e730fa';
+    r'2fd9535d048238ad219aea2a608c6549a9dbb3c3';
 
 @ProviderFor(loginUseCase)
 final loginUseCaseProvider = LoginUseCaseProvider._();
@@ -496,7 +496,7 @@ final class LoginUseCaseProvider
         argument: null,
         retry: null,
         name: r'loginUseCaseProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -523,7 +523,7 @@ final class LoginUseCaseProvider
   }
 }
 
-String _$loginUseCaseHash() => r'3dcd67871dd409e48fec25dccaec07b22901b35d';
+String _$loginUseCaseHash() => r'775f951f09e80feb01ac1441a74c85179e299f94';
 
 @ProviderFor(logoutUseCase)
 final logoutUseCaseProvider = LogoutUseCaseProvider._();
@@ -537,7 +537,7 @@ final class LogoutUseCaseProvider
         argument: null,
         retry: null,
         name: r'logoutUseCaseProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -564,7 +564,7 @@ final class LogoutUseCaseProvider
   }
 }
 
-String _$logoutUseCaseHash() => r'9dad12162a83228303546bc3426be5e3d03b3d81';
+String _$logoutUseCaseHash() => r'36d78569231076b649817e6cf24d4d18e063f382';
 
 @ProviderFor(getSavedSessionUseCase)
 final getSavedSessionUseCaseProvider = GetSavedSessionUseCaseProvider._();
@@ -579,7 +579,7 @@ final class GetSavedSessionUseCaseProvider
         argument: null,
         retry: null,
         name: r'getSavedSessionUseCaseProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -607,7 +607,7 @@ final class GetSavedSessionUseCaseProvider
 }
 
 String _$getSavedSessionUseCaseHash() =>
-    r'774515bea137e114cc1cff639c371efc993a142d';
+    r'd95ff621e86a23a94a8ae552464b9c853b8b1dd0';
 
 @ProviderFor(getCachedCatalogUseCase)
 final getCachedCatalogUseCaseProvider = GetCachedCatalogUseCaseProvider._();
@@ -626,7 +626,7 @@ final class GetCachedCatalogUseCaseProvider
         argument: null,
         retry: null,
         name: r'getCachedCatalogUseCaseProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -654,7 +654,7 @@ final class GetCachedCatalogUseCaseProvider
 }
 
 String _$getCachedCatalogUseCaseHash() =>
-    r'b305c38ad4fc18848a654dc06523bc4ae332949e';
+    r'0677652cd96b1055da1e8203766cdbfe39d6f137';
 
 @ProviderFor(refreshCatalogUseCase)
 final refreshCatalogUseCaseProvider = RefreshCatalogUseCaseProvider._();
@@ -668,7 +668,7 @@ final class RefreshCatalogUseCaseProvider
         argument: null,
         retry: null,
         name: r'refreshCatalogUseCaseProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -696,7 +696,7 @@ final class RefreshCatalogUseCaseProvider
 }
 
 String _$refreshCatalogUseCaseHash() =>
-    r'bd11b498efb298ccd8b97d8d41ce51aa64d41a25';
+    r'a871c9169fd70cd219ccc322c27f1bdaa7003096';
 
 @ProviderFor(getExpensesUseCase)
 final getExpensesUseCaseProvider = GetExpensesUseCaseProvider._();
@@ -710,7 +710,7 @@ final class GetExpensesUseCaseProvider
         argument: null,
         retry: null,
         name: r'getExpensesUseCaseProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -738,7 +738,7 @@ final class GetExpensesUseCaseProvider
 }
 
 String _$getExpensesUseCaseHash() =>
-    r'a38d60ce89485319e732a03c03d9ac9783a2d533';
+    r'e097e3e5a9398fa9182fcb9e66cdd47c414e716f';
 
 @ProviderFor(addExpenseUseCase)
 final addExpenseUseCaseProvider = AddExpenseUseCaseProvider._();
@@ -752,7 +752,7 @@ final class AddExpenseUseCaseProvider
         argument: null,
         retry: null,
         name: r'addExpenseUseCaseProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -779,7 +779,7 @@ final class AddExpenseUseCaseProvider
   }
 }
 
-String _$addExpenseUseCaseHash() => r'1d2954ac37cb924f5f07ca46b436017d0fbd6960';
+String _$addExpenseUseCaseHash() => r'a11f7654e19294b4502989de88cd4e7b0f86a8be';
 
 @ProviderFor(deleteExpenseUseCase)
 final deleteExpenseUseCaseProvider = DeleteExpenseUseCaseProvider._();
@@ -793,7 +793,7 @@ final class DeleteExpenseUseCaseProvider
         argument: null,
         retry: null,
         name: r'deleteExpenseUseCaseProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -821,7 +821,7 @@ final class DeleteExpenseUseCaseProvider
 }
 
 String _$deleteExpenseUseCaseHash() =>
-    r'8b869356363dbf4f5a1567dee499ef3867a31258';
+    r'e77408eb3f9f69b020ff7724debdf6d5c3cdd094';
 
 @ProviderFor(getMonthlySummaryUseCase)
 final getMonthlySummaryUseCaseProvider = GetMonthlySummaryUseCaseProvider._();
@@ -840,7 +840,7 @@ final class GetMonthlySummaryUseCaseProvider
         argument: null,
         retry: null,
         name: r'getMonthlySummaryUseCaseProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -869,7 +869,7 @@ final class GetMonthlySummaryUseCaseProvider
 }
 
 String _$getMonthlySummaryUseCaseHash() =>
-    r'f70686847e0d0fb7c68ec2bdf46c4ac2bc6a8824';
+    r'8c819537d29e86f3e9dfafb49b9d8e97e02ea421';
 
 @ProviderFor(AuthController)
 final authControllerProvider = AuthControllerProvider._();
@@ -984,7 +984,7 @@ final class ExpensesControllerProvider
 }
 
 String _$expensesControllerHash() =>
-    r'00aea573b212c30c44e230794d01eeac341b309e';
+    r'051057ac217ea970814a07575dc8b0efa9ef74c3';
 
 abstract class _$ExpensesController extends $AsyncNotifier<List<ExpenseEntry>> {
   FutureOr<List<ExpenseEntry>> build();
@@ -1005,8 +1005,20 @@ abstract class _$ExpensesController extends $AsyncNotifier<List<ExpenseEntry>> {
   }
 }
 
+/// Reads the monthly summary. Does NOT watch `expensesControllerProvider` —
+/// that would re-run the SQL query on every state transition of the
+/// expenses list (including the initial loading -> data), which keeps the
+/// summary permanently at `loading`. Instead, `ExpensesController` calls
+/// `ref.invalidate(monthlySummaryProvider)` after successful mutations.
+
 @ProviderFor(monthlySummary)
 final monthlySummaryProvider = MonthlySummaryFamily._();
+
+/// Reads the monthly summary. Does NOT watch `expensesControllerProvider` —
+/// that would re-run the SQL query on every state transition of the
+/// expenses list (including the initial loading -> data), which keeps the
+/// summary permanently at `loading`. Instead, `ExpensesController` calls
+/// `ref.invalidate(monthlySummaryProvider)` after successful mutations.
 
 final class MonthlySummaryProvider
     extends
@@ -1016,6 +1028,11 @@ final class MonthlySummaryProvider
           FutureOr<MonthlySummary>
         >
     with $FutureModifier<MonthlySummary>, $FutureProvider<MonthlySummary> {
+  /// Reads the monthly summary. Does NOT watch `expensesControllerProvider` —
+  /// that would re-run the SQL query on every state transition of the
+  /// expenses list (including the initial loading -> data), which keeps the
+  /// summary permanently at `loading`. Instead, `ExpensesController` calls
+  /// `ref.invalidate(monthlySummaryProvider)` after successful mutations.
   MonthlySummaryProvider._({
     required MonthlySummaryFamily super.from,
     required DateTime super.argument,
@@ -1060,7 +1077,13 @@ final class MonthlySummaryProvider
   }
 }
 
-String _$monthlySummaryHash() => r'2f68c95fd2d4a5ac56a43d3102f5b30a19c962ea';
+String _$monthlySummaryHash() => r'32d4da3e5af38a2c5ee331a68aabe8bbb2d596a6';
+
+/// Reads the monthly summary. Does NOT watch `expensesControllerProvider` —
+/// that would re-run the SQL query on every state transition of the
+/// expenses list (including the initial loading -> data), which keeps the
+/// summary permanently at `loading`. Instead, `ExpensesController` calls
+/// `ref.invalidate(monthlySummaryProvider)` after successful mutations.
 
 final class MonthlySummaryFamily extends $Family
     with $FunctionalFamilyOverride<FutureOr<MonthlySummary>, DateTime> {
@@ -1072,6 +1095,12 @@ final class MonthlySummaryFamily extends $Family
         $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
+
+  /// Reads the monthly summary. Does NOT watch `expensesControllerProvider` —
+  /// that would re-run the SQL query on every state transition of the
+  /// expenses list (including the initial loading -> data), which keeps the
+  /// summary permanently at `loading`. Instead, `ExpensesController` calls
+  /// `ref.invalidate(monthlySummaryProvider)` after successful mutations.
 
   MonthlySummaryProvider call(DateTime month) =>
       MonthlySummaryProvider._(argument: month, from: this);
