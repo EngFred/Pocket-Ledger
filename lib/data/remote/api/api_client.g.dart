@@ -48,9 +48,9 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<ProductListDto> getProducts({int? limit}) async {
+  Future<ProductListDto> getProducts({int? limit, int? skip}) async {
     final _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{r'limit': limit};
+    final queryParameters = <String, dynamic>{r'limit': limit, r'skip': skip};
     queryParameters.removeWhere((k, v) => v == null);
     final _headers = <String, dynamic>{};
     const Map<String, dynamic>? _data = null;

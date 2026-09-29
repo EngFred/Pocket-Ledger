@@ -4,6 +4,7 @@ import '../../core/error/dio_failure_mapper.dart';
 import '../../core/error/failure.dart';
 import '../../core/error/result.dart';
 import '../../domain/entities/product.dart';
+import '../../domain/entities/product_page.dart';
 import '../../domain/repositories/catalog_repository.dart';
 import '../local/cache/catalog_cache.dart';
 import '../remote/api/api_client.dart';
@@ -15,9 +16,12 @@ class CatalogRepositoryImpl implements CatalogRepository {
   const CatalogRepositoryImpl(this._api, this._cache);
 
   @override
-  Future<Result<List<Product>>> fetchFromNetwork() => _run(() async {
-    final dto = await _api.getProducts(limit: 30);
-    return dto.products
+  Future<Result<ProductPage>> fetchPage({
+    required int skip,
+    required int limit,
+  }) => _run(() async {
+    final dto = await _api.getProducts(skip: skip, limit: limit);
+    final products = dto.products
         .map(
           (p) => Product(
             id: p.id,
@@ -29,14 +33,21 @@ class CatalogRepositoryImpl implements CatalogRepository {
           ),
         )
         .toList(growable: false);
+    return ProductPage(
+      products: products,
+      total: dto.total,
+      // Use the values we asked for; do not trust the DTO's defaults.
+      skip: skip,
+      limit: limit,
+    );
   });
 
   @override
   Future<Result<List<Product>?>> readFromCache() => _run(_cache.read);
 
   @override
-  Future<Result<void>> writeToCache(List<Product> products) =>
-      _run(() => _cache.write(products));
+  Future<Result<void>> mergeIntoCache(List<Product> products) =>
+      _run(() => _cache.merge(products));
 
   Future<Result<T>> _run<T>(Future<T> Function() body) async {
     try {

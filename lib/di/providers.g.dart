@@ -656,47 +656,52 @@ final class GetCachedCatalogUseCaseProvider
 String _$getCachedCatalogUseCaseHash() =>
     r'0677652cd96b1055da1e8203766cdbfe39d6f137';
 
-@ProviderFor(refreshCatalogUseCase)
-final refreshCatalogUseCaseProvider = RefreshCatalogUseCaseProvider._();
+@ProviderFor(fetchCatalogPageUseCase)
+final fetchCatalogPageUseCaseProvider = FetchCatalogPageUseCaseProvider._();
 
-final class RefreshCatalogUseCaseProvider
-    extends $FunctionalProvider<RefreshCatalog, RefreshCatalog, RefreshCatalog>
-    with $Provider<RefreshCatalog> {
-  RefreshCatalogUseCaseProvider._()
+final class FetchCatalogPageUseCaseProvider
+    extends
+        $FunctionalProvider<
+          FetchCatalogPage,
+          FetchCatalogPage,
+          FetchCatalogPage
+        >
+    with $Provider<FetchCatalogPage> {
+  FetchCatalogPageUseCaseProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'refreshCatalogUseCaseProvider',
+        name: r'fetchCatalogPageUseCaseProvider',
         isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$refreshCatalogUseCaseHash();
+  String debugGetCreateSourceHash() => _$fetchCatalogPageUseCaseHash();
 
   @$internal
   @override
-  $ProviderElement<RefreshCatalog> $createElement($ProviderPointer pointer) =>
+  $ProviderElement<FetchCatalogPage> $createElement($ProviderPointer pointer) =>
       $ProviderElement(pointer);
 
   @override
-  RefreshCatalog create(Ref ref) {
-    return refreshCatalogUseCase(ref);
+  FetchCatalogPage create(Ref ref) {
+    return fetchCatalogPageUseCase(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(RefreshCatalog value) {
+  Override overrideWithValue(FetchCatalogPage value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<RefreshCatalog>(value),
+      providerOverride: $SyncValueProvider<FetchCatalogPage>(value),
     );
   }
 }
 
-String _$refreshCatalogUseCaseHash() =>
-    r'a871c9169fd70cd219ccc322c27f1bdaa7003096';
+String _$fetchCatalogPageUseCaseHash() =>
+    r'769503b49437e45b703bac619db817d29b9ab264';
 
 @ProviderFor(getExpensesUseCase)
 final getExpensesUseCaseProvider = GetExpensesUseCaseProvider._();
@@ -919,7 +924,7 @@ abstract class _$AuthController extends $AsyncNotifier<UserSession?> {
 final catalogControllerProvider = CatalogControllerProvider._();
 
 final class CatalogControllerProvider
-    extends $AsyncNotifierProvider<CatalogController, List<Product>> {
+    extends $AsyncNotifierProvider<CatalogController, CatalogState> {
   CatalogControllerProvider._()
     : super(
         from: null,
@@ -939,19 +944,19 @@ final class CatalogControllerProvider
   CatalogController create() => CatalogController();
 }
 
-String _$catalogControllerHash() => r'e057fb581d4b4e5badc93a8103b38ce20be0323e';
+String _$catalogControllerHash() => r'e3d41a4223df0c335869ac3c9758bf9dfe177a5f';
 
-abstract class _$CatalogController extends $AsyncNotifier<List<Product>> {
-  FutureOr<List<Product>> build();
+abstract class _$CatalogController extends $AsyncNotifier<CatalogState> {
+  FutureOr<CatalogState> build();
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<List<Product>>, List<Product>>;
+    final ref = this.ref as $Ref<AsyncValue<CatalogState>, CatalogState>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<List<Product>>, List<Product>>,
-              AsyncValue<List<Product>>,
+              AnyNotifier<AsyncValue<CatalogState>, CatalogState>,
+              AsyncValue<CatalogState>,
               Object?,
               Object?
             >;

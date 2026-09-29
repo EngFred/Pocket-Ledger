@@ -21,6 +21,8 @@ abstract class ProductListDto with _$ProductListDto {
   const factory ProductListDto({
     required List<ProductDto> products,
     required int total,
+    @Default(0) int skip,
+    @Default(0) int limit,
   }) = _ProductListDto;
 
   factory ProductListDto.fromJson(Map<String, dynamic> json) =>

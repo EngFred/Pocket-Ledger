@@ -28,10 +28,17 @@ _ProductListDto _$ProductListDtoFromJson(Map<String, dynamic> json) =>
           .map((e) => ProductDto.fromJson(e as Map<String, dynamic>))
           .toList(),
       total: (json['total'] as num).toInt(),
+      skip: (json['skip'] as num?)?.toInt() ?? 0,
+      limit: (json['limit'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$ProductListDtoToJson(_ProductListDto instance) =>
-    <String, dynamic>{'products': instance.products, 'total': instance.total};
+    <String, dynamic>{
+      'products': instance.products,
+      'total': instance.total,
+      'skip': instance.skip,
+      'limit': instance.limit,
+    };
 
 _ProductDto _$ProductDtoFromJson(Map<String, dynamic> json) => _ProductDto(
   id: (json['id'] as num).toInt(),

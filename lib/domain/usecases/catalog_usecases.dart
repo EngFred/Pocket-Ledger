@@ -1,5 +1,6 @@
 import '../../core/error/result.dart';
 import '../entities/product.dart';
+import '../entities/product_page.dart';
 import '../repositories/catalog_repository.dart';
 
 class GetCachedCatalog {
@@ -9,15 +10,19 @@ class GetCachedCatalog {
   Future<Result<List<Product>?>> call() => _repo.readFromCache();
 }
 
-class RefreshCatalog {
+/// Fetches one page from the network AND merges it into the cache.
+/// The controller doesn't have to remember to do both.
+class FetchCatalogPage {
   final CatalogRepository _repo;
-  const RefreshCatalog(this._repo);
+  const FetchCatalogPage(this._repo);
 
-  /// Fetch from network, then persist. Returns what was fetched.
-  Future<Result<List<Product>>> call() async {
-    final result = await _repo.fetchFromNetwork();
-    if (result is Ok<List<Product>>) {
-      await _repo.writeToCache(result.value);
+  Future<Result<ProductPage>> call({
+    required int skip,
+    required int limit,
+  }) async {
+    final result = await _repo.fetchPage(skip: skip, limit: limit);
+    if (result is Ok<ProductPage>) {
+      await _repo.mergeIntoCache(result.value.products);
     }
     return result;
   }

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/error/result.dart';
 import '../../di/providers.dart';
 import '../../domain/entities/expense_entry.dart';
+import '../../domain/entities/product.dart';
 
 class ExpenseFormScreen extends ConsumerStatefulWidget {
   const ExpenseFormScreen({super.key});
@@ -66,10 +67,11 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Categories from the cached catalog, deduped.
-    final catalog = ref.watch(catalogControllerProvider).value ?? const [];
-    final categories = <String>{for (final p in catalog) p.category}.toList()
-      ..sort();
+    // Categories from the accumulated catalog state, deduped.
+    final catalogState = ref.watch(catalogControllerProvider).value;
+    final categories = <String>{
+      for (final p in catalogState?.items ?? const <Product>[]) p.category,
+    }.toList()..sort();
 
     return Scaffold(
       appBar: AppBar(title: const Text('New expense')),
@@ -104,7 +106,7 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              initialValue: _category,
+              value: _category,
               items: [
                 for (final c in categories)
                   DropdownMenuItem(value: c, child: Text(c)),

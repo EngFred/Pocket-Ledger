@@ -288,7 +288,7 @@ as String,
 /// @nodoc
 mixin _$ProductListDto {
 
- List<ProductDto> get products; int get total;
+ List<ProductDto> get products; int get total; int get skip; int get limit;
 /// Create a copy of ProductListDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -301,16 +301,16 @@ $ProductListDtoCopyWith<ProductListDto> get copyWith => _$ProductListDtoCopyWith
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProductListDto&&const DeepCollectionEquality().equals(other.products, products)&&(identical(other.total, total) || other.total == total));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ProductListDto&&const DeepCollectionEquality().equals(other.products, products)&&(identical(other.total, total) || other.total == total)&&(identical(other.skip, skip) || other.skip == skip)&&(identical(other.limit, limit) || other.limit == limit));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(products),total);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(products),total,skip,limit);
 
 @override
 String toString() {
-  return 'ProductListDto(products: $products, total: $total)';
+  return 'ProductListDto(products: $products, total: $total, skip: $skip, limit: $limit)';
 }
 
 
@@ -321,7 +321,7 @@ abstract mixin class $ProductListDtoCopyWith<$Res>  {
   factory $ProductListDtoCopyWith(ProductListDto value, $Res Function(ProductListDto) _then) = _$ProductListDtoCopyWithImpl;
 @useResult
 $Res call({
- List<ProductDto> products, int total
+ List<ProductDto> products, int total, int skip, int limit
 });
 
 
@@ -338,10 +338,12 @@ class _$ProductListDtoCopyWithImpl<$Res>
 
 /// Create a copy of ProductListDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? products = null,Object? total = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? products = null,Object? total = null,Object? skip = null,Object? limit = null,}) {
   return _then(ProductListDto(
 products: null == products ? _self.products : products // ignore: cast_nullable_to_non_nullable
 as List<ProductDto>,total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,skip: null == skip ? _self.skip : skip // ignore: cast_nullable_to_non_nullable
+as int,limit: null == limit ? _self.limit : limit // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
@@ -427,10 +429,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<ProductDto> products,  int total)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<ProductDto> products,  int total,  int skip,  int limit)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ProductListDto() when $default != null:
-return $default(_that.products,_that.total);case _:
+return $default(_that.products,_that.total,_that.skip,_that.limit);case _:
   return orElse();
 
 }
@@ -448,10 +450,10 @@ return $default(_that.products,_that.total);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<ProductDto> products,  int total)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<ProductDto> products,  int total,  int skip,  int limit)  $default,) {final _that = this;
 switch (_that) {
 case _ProductListDto():
-return $default(_that.products,_that.total);case _:
+return $default(_that.products,_that.total,_that.skip,_that.limit);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -468,10 +470,10 @@ return $default(_that.products,_that.total);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<ProductDto> products,  int total)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<ProductDto> products,  int total,  int skip,  int limit)?  $default,) {final _that = this;
 switch (_that) {
 case _ProductListDto() when $default != null:
-return $default(_that.products,_that.total);case _:
+return $default(_that.products,_that.total,_that.skip,_that.limit);case _:
   return null;
 
 }
@@ -483,7 +485,7 @@ return $default(_that.products,_that.total);case _:
 @JsonSerializable()
 
 class _ProductListDto implements ProductListDto {
-  const _ProductListDto({required  List<ProductDto> products, required this.total}): _products = products;
+  const _ProductListDto({required  List<ProductDto> products, required this.total, this.skip = 0, this.limit = 0}): _products = products;
   factory _ProductListDto.fromJson(Map<String, dynamic> json) => _$ProductListDtoFromJson(json);
 
  final  List<ProductDto> _products;
@@ -494,6 +496,8 @@ class _ProductListDto implements ProductListDto {
 }
 
 @override final  int total;
+@override@JsonKey() final  int skip;
+@override@JsonKey() final  int limit;
 
 /// Create a copy of ProductListDto
 /// with the given fields replaced by the non-null parameter values.
@@ -508,16 +512,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProductListDto&&const DeepCollectionEquality().equals(other._products, _products)&&(identical(other.total, total) || other.total == total));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _ProductListDto&&const DeepCollectionEquality().equals(other._products, _products)&&(identical(other.total, total) || other.total == total)&&(identical(other.skip, skip) || other.skip == skip)&&(identical(other.limit, limit) || other.limit == limit));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_products),total);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_products),total,skip,limit);
 
 @override
 String toString() {
-  return 'ProductListDto(products: $products, total: $total)';
+  return 'ProductListDto(products: $products, total: $total, skip: $skip, limit: $limit)';
 }
 
 
@@ -528,7 +532,7 @@ abstract mixin class _$ProductListDtoCopyWith<$Res> implements $ProductListDtoCo
   factory _$ProductListDtoCopyWith(_ProductListDto value, $Res Function(_ProductListDto) _then) = __$ProductListDtoCopyWithImpl;
 @override @useResult
 $Res call({
- List<ProductDto> products, int total
+ List<ProductDto> products, int total, int skip, int limit
 });
 
 
@@ -545,10 +549,12 @@ class __$ProductListDtoCopyWithImpl<$Res>
 
 /// Create a copy of ProductListDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? products = null,Object? total = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? products = null,Object? total = null,Object? skip = null,Object? limit = null,}) {
   return _then(_ProductListDto(
 products: null == products ? _self._products : products // ignore: cast_nullable_to_non_nullable
 as List<ProductDto>,total: null == total ? _self.total : total // ignore: cast_nullable_to_non_nullable
+as int,skip: null == skip ? _self.skip : skip // ignore: cast_nullable_to_non_nullable
+as int,limit: null == limit ? _self.limit : limit // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }

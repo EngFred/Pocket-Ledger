@@ -4,12 +4,43 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../di/providers.dart';
 import '../../domain/entities/product.dart';
 
-class CatalogScreen extends ConsumerWidget {
+class CatalogScreen extends ConsumerStatefulWidget {
   const CatalogScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final catalogAsync = ref.watch(catalogControllerProvider);
+  ConsumerState<CatalogScreen> createState() => _CatalogScreenState();
+}
+
+class _CatalogScreenState extends ConsumerState<CatalogScreen> {
+  static const _loadMoreThreshold = 400.0;
+
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController
+      ..removeListener(_onScroll)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final pos = _scrollController.position;
+    if (pos.pixels >= pos.maxScrollExtent - _loadMoreThreshold) {
+      ref.read(catalogControllerProvider.notifier).loadMore();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final stateAsync = ref.watch(catalogControllerProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -17,34 +48,72 @@ class CatalogScreen extends ConsumerWidget {
         actions: [
           IconButton(
             onPressed: () =>
-                ref.read(catalogControllerProvider.notifier).refreshNow(),
+                ref.read(catalogControllerProvider.notifier).refresh(),
             icon: const Icon(Icons.refresh),
             tooltip: 'Refresh',
           ),
         ],
       ),
-      body: catalogAsync.when(
+      body: stateAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => _ErrorView(
           error: err,
-          onRetry: () =>
-              ref.read(catalogControllerProvider.notifier).refreshNow(),
+          onRetry: () => ref.read(catalogControllerProvider.notifier).refresh(),
         ),
-        data: (products) {
-          if (products.isEmpty) {
+        data: (state) {
+          if (state.items.isEmpty && !state.isLoadingMore) {
             return const Center(child: Text('No products available.'));
           }
           return RefreshIndicator(
             onRefresh: () =>
-                ref.read(catalogControllerProvider.notifier).refreshNow(),
+                ref.read(catalogControllerProvider.notifier).refresh(),
             child: ListView.separated(
+              controller: _scrollController,
               physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: products.length,
+              // One extra row at the bottom for the footer, only if there
+              // might be more to load.
+              itemCount: state.items.length + (state.hasMore ? 1 : 0),
               separatorBuilder: (_, __) => const Divider(height: 1),
-              itemBuilder: (_, i) => _ProductTile(product: products[i]),
+              itemBuilder: (_, i) {
+                if (i >= state.items.length) {
+                  return _CatalogFooter(
+                    isLoading: state.isLoadingMore,
+                    onLoadMore: () =>
+                        ref.read(catalogControllerProvider.notifier).loadMore(),
+                  );
+                }
+                return _ProductTile(product: state.items[i]);
+              },
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _CatalogFooter extends StatelessWidget {
+  final bool isLoading;
+  final VoidCallback onLoadMore;
+
+  const _CatalogFooter({required this.isLoading, required this.onLoadMore});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: Center(
+        child: isLoading
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : TextButton.icon(
+                onPressed: onLoadMore,
+                icon: const Icon(Icons.expand_more),
+                label: const Text('Load more'),
+              ),
       ),
     );
   }

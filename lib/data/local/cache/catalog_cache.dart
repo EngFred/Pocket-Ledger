@@ -5,7 +5,7 @@ import '../../../domain/entities/product.dart';
 
 abstract interface class CatalogCache {
   Future<List<Product>?> read();
-  Future<void> write(List<Product> products);
+  Future<void> merge(List<Product> products);
   Future<void> clear();
 }
 
@@ -24,18 +24,24 @@ class CatalogCacheImpl implements CatalogCache {
           .map((m) => Product.fromJson(m.cast<String, dynamic>()))
           .toList(growable: false);
     } catch (_) {
-      // Corrupted cache — treat as empty rather than crash.
+      // Corrupted entry — treat as empty rather than crash.
       await _box.delete(_key);
       return null;
     }
   }
 
   @override
-  Future<void> write(List<Product> products) async {
+  Future<void> merge(List<Product> products) async {
     try {
+      final existing = await read() ?? const <Product>[];
+      final byId = <int, Product>{for (final p in existing) p.id: p};
+      for (final p in products) {
+        byId[p.id] = p;
+      }
+      final merged = byId.values.toList()..sort((a, b) => a.id.compareTo(b.id));
       await _box.put(
         _key,
-        products.map((p) => p.toJson()).toList(growable: false),
+        merged.map((p) => p.toJson()).toList(growable: false),
       );
     } catch (_) {
       throw const StorageFailure('Could not cache the catalog.');

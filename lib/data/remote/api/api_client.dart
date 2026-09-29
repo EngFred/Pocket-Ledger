@@ -13,5 +13,8 @@ abstract class ApiClient {
   Future<LoginResponseDto> login(@Body() Map<String, dynamic> body);
 
   @GET('/products')
-  Future<ProductListDto> getProducts({@Query('limit') int? limit});
+  Future<ProductListDto> getProducts({
+    @Query('limit') int? limit,
+    @Query('skip') int? skip,
+  });
 }

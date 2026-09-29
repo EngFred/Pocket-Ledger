@@ -20,6 +20,7 @@ import '../data/repositories/expense_repository_impl.dart';
 import '../data/repositories/settings_repository_impl.dart';
 import '../domain/entities/expense_entry.dart';
 import '../domain/entities/product.dart';
+import '../domain/entities/product_page.dart';
 import '../domain/entities/settings.dart';
 import '../domain/entities/user_session.dart';
 import '../domain/repositories/auth_repository.dart';
@@ -29,6 +30,7 @@ import '../domain/repositories/settings_repository.dart';
 import '../domain/usecases/auth_usecases.dart';
 import '../domain/usecases/catalog_usecases.dart';
 import '../domain/usecases/expense_usecases.dart';
+import '../presentation/state/catalog_state.dart';
 
 part 'providers.g.dart';
 
@@ -135,8 +137,8 @@ GetCachedCatalog getCachedCatalogUseCase(Ref ref) =>
     GetCachedCatalog(ref.watch(catalogRepositoryProvider));
 
 @Riverpod(keepAlive: true)
-RefreshCatalog refreshCatalogUseCase(Ref ref) =>
-    RefreshCatalog(ref.watch(catalogRepositoryProvider));
+FetchCatalogPage fetchCatalogPageUseCase(Ref ref) =>
+    FetchCatalogPage(ref.watch(catalogRepositoryProvider));
 
 @Riverpod(keepAlive: true)
 GetExpenses getExpensesUseCase(Ref ref) =>
@@ -182,33 +184,124 @@ class AuthController extends _$AuthController {
 
 @riverpod
 class CatalogController extends _$CatalogController {
+  static const _pageSize = 20;
+
   @override
-  Future<List<Product>> build() async {
+  Future<CatalogState> build() async {
     final cached = await ref.read(getCachedCatalogUseCaseProvider)();
-    final cachedList = cached.fold(onOk: (v) => v, onErr: (_) => null);
+    final cachedItems = cached.fold(
+      onOk: (v) => v ?? const <Product>[],
+      onErr: (_) => const <Product>[],
+    );
 
-    if (cachedList != null && cachedList.isNotEmpty) {
-      Future.microtask(_refresh);
-      return cachedList;
+    // No cache — we must wait for the network. Errors here surface as
+    // AsyncError and the screen shows the error panel.
+    if (cachedItems.isEmpty) {
+      final result = await ref.read(fetchCatalogPageUseCaseProvider)(
+        skip: 0,
+        limit: _pageSize,
+      );
+      return result.fold(
+        onOk: (page) => CatalogState(
+          items: page.products,
+          total: page.total,
+          hasMore: page.products.length < page.total,
+        ),
+        onErr: (f) => throw f,
+      );
     }
 
-    final fresh = await ref.read(refreshCatalogUseCaseProvider)();
-    return fresh.getOrThrow();
+    // Cache present — show it immediately, refresh in the background.
+    Future.microtask(() => _fetch(skip: 0, replace: true, silent: true));
+    return CatalogState(
+      items: cachedItems,
+      total: cachedItems.length,
+      hasMore: true,
+    );
   }
 
-  Future<void> _refresh() async {
-    final result = await ref.read(refreshCatalogUseCaseProvider)();
-    if (result is Ok<List<Product>>) {
-      state = AsyncData(result.value);
+  /// Triggered by the scroll listener when the user nears the bottom.
+  Future<void> loadMore() async {
+    final current = state.value;
+    if (current == null) return;
+    if (current.isLoadingMore || !current.hasMore) return;
+
+    state = AsyncData(current.copyWith(isLoadingMore: true));
+    await _fetch(skip: current.items.length, replace: false, silent: false);
+  }
+
+  /// Pull-to-refresh and the AppBar button. Reloads page 0 and resets
+  /// pagination. On error, keeps whatever the user was already looking at.
+  Future<void> refresh() async {
+    final result = await ref.read(fetchCatalogPageUseCaseProvider)(
+      skip: 0,
+      limit: _pageSize,
+    );
+
+    if (result is Ok<ProductPage>) {
+      final page = result.value;
+      state = AsyncData(
+        CatalogState(
+          items: page.products,
+          total: page.total,
+          hasMore: page.products.length < page.total,
+        ),
+      );
     }
   }
 
-  Future<void> refreshNow() async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      final result = await ref.read(refreshCatalogUseCaseProvider)();
-      return result.getOrThrow();
-    });
+  Future<void> _fetch({
+    required int skip,
+    required bool replace,
+    required bool silent,
+  }) async {
+    final result = await ref.read(fetchCatalogPageUseCaseProvider)(
+      skip: skip,
+      limit: _pageSize,
+    );
+
+    result.fold(
+      onOk: (page) {
+        final current = state.value ?? const CatalogState();
+        final items = replace
+            ? page.products
+            : _mergeById(current.items, page.products);
+
+        state = AsyncData(
+          CatalogState(
+            items: items,
+            total: page.total,
+            hasMore: items.length < page.total,
+            isLoadingMore: false,
+          ),
+        );
+      },
+      onErr: (_) {
+        // Silent background failure: stop advertising more pages so the
+        // footer doesn't spin forever on a request that will never land.
+        if (silent) {
+          final current = state.value;
+          if (current != null && current.hasMore) {
+            state = AsyncData(current.copyWith(hasMore: false));
+          }
+          return;
+        }
+        // Footer-load failure: drop the spinner but keep what's on screen.
+        final current = state.value;
+        if (current != null) {
+          state = AsyncData(current.copyWith(isLoadingMore: false));
+        }
+      },
+    );
+  }
+
+  List<Product> _mergeById(List<Product> existing, List<Product> incoming) {
+    final byId = <int, Product>{for (final p in existing) p.id: p};
+    for (final p in incoming) {
+      byId[p.id] = p;
+    }
+    final merged = byId.values.toList()..sort((a, b) => a.id.compareTo(b.id));
+    return List.unmodifiable(merged);
   }
 }
 
@@ -224,9 +317,6 @@ class ExpensesController extends _$ExpensesController {
     final result = await ref.read(addExpenseUseCaseProvider)(entry);
     if (result.isOk) {
       ref.invalidateSelf();
-      // Invalidate the family (no args) to refresh every month's summary.
-      // This is the single point where "expenses changed" is turned into
-      // "summary must reload" — not a watch, not a listener.
       ref.invalidate(monthlySummaryProvider);
     }
     return result;
