@@ -4,18 +4,24 @@ import '../../../domain/entities/expense_entry.dart';
 
 class ExpenseDao {
   final Database _db;
-  const ExpenseDao(this._db);
+  final int _userId;
+  const ExpenseDao(this._db, {required int userId}) : _userId = userId;
 
   static const _table = 'expenses';
 
-  /// All entries, newest first.
   Future<List<ExpenseEntry>> getAll() async {
-    final rows = await _db.query(_table, orderBy: 'date DESC, id DESC');
+    final rows = await _db.query(
+      _table,
+      where: 'userId = ?',
+      whereArgs: [_userId],
+      orderBy: 'date DESC, id DESC',
+    );
     return rows.map(_fromRow).toList(growable: false);
   }
 
   Future<int> insert(ExpenseEntry entry) {
     return _db.insert(_table, {
+      'userId': _userId,
       'amount': entry.amount,
       'category': entry.category,
       'date': entry.date.toIso8601String(),
@@ -23,11 +29,28 @@ class ExpenseDao {
     });
   }
 
-  Future<int> delete(int id) =>
-      _db.delete(_table, where: 'id = ?', whereArgs: [id]);
+  /// Returns the number of rows changed (0 if not found or not owned).
+  Future<int> update(ExpenseEntry entry) {
+    assert(entry.id != null, 'Cannot update an unsaved entry');
+    return _db.update(
+      _table,
+      {
+        'amount': entry.amount,
+        'category': entry.category,
+        'date': entry.date.toIso8601String(),
+        'note': entry.note,
+      },
+      where: 'id = ? AND userId = ?',
+      whereArgs: [entry.id, _userId],
+    );
+  }
 
-  /// One deliberate aggregate query. This is the whole point of picking
-  /// SQLite over a key-value store for this table.
+  Future<int> delete(int id) => _db.delete(
+    _table,
+    where: 'id = ? AND userId = ?',
+    whereArgs: [id, _userId],
+  );
+
   Future<MonthlySummary> summaryForMonth(DateTime month) async {
     final start = DateTime(month.year, month.month, 1);
     final end = DateTime(month.year, month.month + 1, 1);
@@ -37,11 +60,11 @@ class ExpenseDao {
       SELECT category,
              SUM(amount) AS total
       FROM $_table
-      WHERE date >= ? AND date < ?
+      WHERE userId = ? AND date >= ? AND date < ?
       GROUP BY category
       ORDER BY total DESC
       ''',
-      [start.toIso8601String(), end.toIso8601String()],
+      [_userId, start.toIso8601String(), end.toIso8601String()],
     );
 
     final byCategory = rows

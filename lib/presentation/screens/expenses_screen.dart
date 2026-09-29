@@ -158,6 +158,7 @@ class _ExpenseTile extends ConsumerWidget {
         }
       },
       child: ListTile(
+        onTap: () => context.pushNamed(Routes.expenseEdit, extra: entry),
         title: Text(entry.category),
         subtitle: Text(
           '${entry.date.year}-${entry.date.month.toString().padLeft(2, '0')}-'

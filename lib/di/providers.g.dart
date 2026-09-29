@@ -137,6 +137,46 @@ final class SecureStorageProvider
 
 String _$secureStorageHash() => r'0cd1b80f91784467390034386f925a0be155bfbd';
 
+@ProviderFor(currentUserId)
+final currentUserIdProvider = CurrentUserIdProvider._();
+
+final class CurrentUserIdProvider extends $FunctionalProvider<int?, int?, int?>
+    with $Provider<int?> {
+  CurrentUserIdProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'currentUserIdProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$currentUserIdHash();
+
+  @$internal
+  @override
+  $ProviderElement<int?> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  int? create(Ref ref) {
+    return currentUserId(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(int? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<int?>(value),
+    );
+  }
+}
+
+String _$currentUserIdHash() => r'432e03355ef4135722e1f39a0e5850478967e470';
+
 @ProviderFor(tokenStore)
 final tokenStoreProvider = TokenStoreProvider._();
 
@@ -258,7 +298,7 @@ final class CatalogCacheProvider
   }
 }
 
-String _$catalogCacheHash() => r'76ce91f339063c6018eab0ac571e495381e270a4';
+String _$catalogCacheHash() => r'54def8d3211931dc0a148fe6bcd775b56e5f7f51';
 
 @ProviderFor(expenseDao)
 final expenseDaoProvider = ExpenseDaoProvider._();
@@ -299,7 +339,7 @@ final class ExpenseDaoProvider
   }
 }
 
-String _$expenseDaoHash() => r'9d6fbce25ce54284bdab0b59e4bde3aab5a961b9';
+String _$expenseDaoHash() => r'89fbc040dc20db27cbb3a99b105c638c2cb46f42';
 
 @ProviderFor(authRepository)
 final authRepositoryProvider = AuthRepositoryProvider._();
@@ -786,6 +826,48 @@ final class AddExpenseUseCaseProvider
 
 String _$addExpenseUseCaseHash() => r'a11f7654e19294b4502989de88cd4e7b0f86a8be';
 
+@ProviderFor(updateExpenseUseCase)
+final updateExpenseUseCaseProvider = UpdateExpenseUseCaseProvider._();
+
+final class UpdateExpenseUseCaseProvider
+    extends $FunctionalProvider<UpdateExpense, UpdateExpense, UpdateExpense>
+    with $Provider<UpdateExpense> {
+  UpdateExpenseUseCaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'updateExpenseUseCaseProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$updateExpenseUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<UpdateExpense> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  UpdateExpense create(Ref ref) {
+    return updateExpenseUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(UpdateExpense value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<UpdateExpense>(value),
+    );
+  }
+}
+
+String _$updateExpenseUseCaseHash() =>
+    r'289a9831247270994a55e338cc42f7bf14772769';
+
 @ProviderFor(deleteExpenseUseCase)
 final deleteExpenseUseCaseProvider = DeleteExpenseUseCaseProvider._();
 
@@ -944,7 +1026,7 @@ final class CatalogControllerProvider
   CatalogController create() => CatalogController();
 }
 
-String _$catalogControllerHash() => r'e3d41a4223df0c335869ac3c9758bf9dfe177a5f';
+String _$catalogControllerHash() => r'dadb05851028ffd1c058ffd43ca3960d8833ba44';
 
 abstract class _$CatalogController extends $AsyncNotifier<CatalogState> {
   FutureOr<CatalogState> build();
@@ -989,7 +1071,7 @@ final class ExpensesControllerProvider
 }
 
 String _$expensesControllerHash() =>
-    r'051057ac217ea970814a07575dc8b0efa9ef74c3';
+    r'96e92467a10cebc1c246312abb7433cce2dcc873';
 
 abstract class _$ExpensesController extends $AsyncNotifier<List<ExpenseEntry>> {
   FutureOr<List<ExpenseEntry>> build();
@@ -1082,7 +1164,7 @@ final class MonthlySummaryProvider
   }
 }
 
-String _$monthlySummaryHash() => r'32d4da3e5af38a2c5ee331a68aabe8bbb2d596a6';
+String _$monthlySummaryHash() => r'fc13250136d85f0be02261d153a571fa252798b4';
 
 /// Reads the monthly summary. Does NOT watch `expensesControllerProvider` —
 /// that would re-run the SQL query on every state transition of the

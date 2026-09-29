@@ -16,7 +16,19 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
       _run(() => _dao.insert(entry));
 
   @override
-  Future<Result<void>> delete(int id) => _run(() async => _dao.delete(id));
+  Future<Result<void>> update(ExpenseEntry entry) => _run(() async {
+    final rows = await _dao.update(entry);
+    if (rows == 0) {
+      throw const StorageFailure(
+        'This expense could not be updated. It may have been deleted.',
+      );
+    }
+  });
+
+  @override
+  Future<Result<void>> delete(int id) => _run(() async {
+    await _dao.delete(id);
+  });
 
   @override
   Future<Result<MonthlySummary>> summaryForMonth(DateTime month) =>

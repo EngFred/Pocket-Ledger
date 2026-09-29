@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../core/error/result.dart';
+import '../core/network/retry.dart';
 import '../data/local/cache/catalog_cache.dart';
 import '../data/local/database/expense_dao.dart';
 import '../data/local/preferences/settings_store.dart';
@@ -76,6 +77,17 @@ ApiClient apiClient(Ref ref) => ApiClient(ref.watch(dioClientProvider));
 FlutterSecureStorage secureStorage(Ref ref) => const FlutterSecureStorage();
 
 // ─────────────────────────────────────────────────────────────────────────
+// Current user — the single source of truth for "whose data is this?"
+// Every per-user data source and list controller depends on it. When the
+// session changes (login, logout, account switch), these rebuild.
+// ─────────────────────────────────────────────────────────────────────────
+
+@Riverpod(keepAlive: true)
+int? currentUserId(Ref ref) {
+  return ref.watch(authControllerProvider).value?.userId;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
 // Local storage — one provider per layer
 // ─────────────────────────────────────────────────────────────────────────
 
@@ -88,11 +100,16 @@ SettingsStore settingsStore(Ref ref) =>
     SettingsStore(ref.watch(sharedPreferencesProvider));
 
 @Riverpod(keepAlive: true)
-CatalogCache catalogCache(Ref ref) =>
-    CatalogCacheImpl(ref.watch(catalogBoxProvider));
+CatalogCache catalogCache(Ref ref) {
+  final userId = ref.watch(currentUserIdProvider) ?? 0;
+  return CatalogCacheImpl(ref.watch(catalogBoxProvider), userId: userId);
+}
 
 @Riverpod(keepAlive: true)
-ExpenseDao expenseDao(Ref ref) => ExpenseDao(ref.watch(databaseProvider));
+ExpenseDao expenseDao(Ref ref) {
+  final userId = ref.watch(currentUserIdProvider) ?? 0;
+  return ExpenseDao(ref.watch(databaseProvider), userId: userId);
+}
 
 // ─────────────────────────────────────────────────────────────────────────
 // Repositories
@@ -149,6 +166,10 @@ AddExpense addExpenseUseCase(Ref ref) =>
     AddExpense(ref.watch(expenseRepositoryProvider));
 
 @Riverpod(keepAlive: true)
+UpdateExpense updateExpenseUseCase(Ref ref) =>
+    UpdateExpense(ref.watch(expenseRepositoryProvider));
+
+@Riverpod(keepAlive: true)
 DeleteExpense deleteExpenseUseCase(Ref ref) =>
     DeleteExpense(ref.watch(expenseRepositoryProvider));
 
@@ -157,7 +178,7 @@ GetMonthlySummary getMonthlySummaryUseCase(Ref ref) =>
     GetMonthlySummary(ref.watch(expenseRepositoryProvider));
 
 // ─────────────────────────────────────────────────────────────────────────
-// Controllers — these CAN be autoDispose, because the UI watches them
+// Controllers — autoDispose is correct here; the UI watches them
 // ─────────────────────────────────────────────────────────────────────────
 
 @riverpod
@@ -188,14 +209,17 @@ class CatalogController extends _$CatalogController {
 
   @override
   Future<CatalogState> build() async {
+    // Rebuild whenever the signed-in user changes.
+    ref.watch(currentUserIdProvider);
+
     final cached = await ref.read(getCachedCatalogUseCaseProvider)();
     final cachedItems = cached.fold(
       onOk: (v) => v ?? const <Product>[],
       onErr: (_) => const <Product>[],
     );
 
-    // No cache — we must wait for the network. Errors here surface as
-    // AsyncError and the screen shows the error panel.
+    // No cache — we must wait for the network. Errors surface as AsyncError
+    // and the screen shows the error panel.
     if (cachedItems.isEmpty) {
       final result = await ref.read(fetchCatalogPageUseCaseProvider)(
         skip: 0,
@@ -255,10 +279,14 @@ class CatalogController extends _$CatalogController {
     required bool replace,
     required bool silent,
   }) async {
-    final result = await ref.read(fetchCatalogPageUseCaseProvider)(
-      skip: skip,
-      limit: _pageSize,
-    );
+    final useCase = ref.read(fetchCatalogPageUseCaseProvider);
+
+    // Silent background refresh gets retried with backoff. User-initiated
+    // loads (pull-to-refresh, "Load more") do not — the user sees the
+    // spinner and can retry by tapping again.
+    final result = silent
+        ? await withRetry(() => useCase(skip: skip, limit: _pageSize))
+        : await useCase(skip: skip, limit: _pageSize);
 
     result.fold(
       onOk: (page) {
@@ -309,12 +337,24 @@ class CatalogController extends _$CatalogController {
 class ExpensesController extends _$ExpensesController {
   @override
   Future<List<ExpenseEntry>> build() async {
+    // Rebuild whenever the signed-in user changes.
+    ref.watch(currentUserIdProvider);
+
     final result = await ref.read(getExpensesUseCaseProvider)();
     return result.getOrThrow();
   }
 
   Future<Result<int>> add(ExpenseEntry entry) async {
     final result = await ref.read(addExpenseUseCaseProvider)(entry);
+    if (result.isOk) {
+      ref.invalidateSelf();
+      ref.invalidate(monthlySummaryProvider);
+    }
+    return result;
+  }
+
+  Future<Result<void>> edit(ExpenseEntry entry) async {
+    final result = await ref.read(updateExpenseUseCaseProvider)(entry);
     if (result.isOk) {
       ref.invalidateSelf();
       ref.invalidate(monthlySummaryProvider);
@@ -339,6 +379,10 @@ class ExpensesController extends _$ExpensesController {
 /// `ref.invalidate(monthlySummaryProvider)` after successful mutations.
 @riverpod
 Future<MonthlySummary> monthlySummary(Ref ref, DateTime month) async {
+  // The summary is per-user too. Without this watch, switching accounts
+  // would leave the previous user's summary on screen.
+  ref.watch(currentUserIdProvider);
+
   final result = await ref.read(getMonthlySummaryUseCaseProvider)(month);
   return result.getOrThrow();
 }

@@ -9,7 +9,8 @@ import '../../domain/entities/expense_entry.dart';
 import '../../domain/entities/product.dart';
 
 class ExpenseFormScreen extends ConsumerStatefulWidget {
-  const ExpenseFormScreen({super.key});
+  final ExpenseEntry? initial;
+  const ExpenseFormScreen({super.key, this.initial});
 
   @override
   ConsumerState<ExpenseFormScreen> createState() => _ExpenseFormScreenState();
@@ -17,11 +18,25 @@ class ExpenseFormScreen extends ConsumerStatefulWidget {
 
 class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _amount = TextEditingController();
-  final _note = TextEditingController();
-  String? _category;
-  DateTime _date = DateTime.now();
+  late final TextEditingController _amount;
+  late final TextEditingController _note;
+  late String? _category;
+  late DateTime _date;
   bool _submitting = false;
+
+  bool get _isEdit => widget.initial != null;
+
+  @override
+  void initState() {
+    super.initState();
+    final initial = widget.initial;
+    _amount = TextEditingController(
+      text: initial == null ? '' : initial.amount.toStringAsFixed(0),
+    );
+    _note = TextEditingController(text: initial?.note ?? '');
+    _category = initial?.category;
+    _date = initial?.date ?? DateTime.now();
+  }
 
   @override
   void dispose() {
@@ -42,15 +57,17 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
     setState(() => _submitting = true);
 
     final entry = ExpenseEntry(
+      id: widget.initial?.id,
       amount: double.parse(_amount.text.trim()),
       category: _category!,
       date: _date,
       note: _note.text.trim(),
     );
 
-    final result = await ref
-        .read(expensesControllerProvider.notifier)
-        .add(entry);
+    final controller = ref.read(expensesControllerProvider.notifier);
+    final result = _isEdit
+        ? await controller.edit(entry)
+        : await controller.add(entry);
 
     if (!mounted) return;
 
@@ -67,14 +84,16 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Categories from the accumulated catalog state, deduped.
     final catalogState = ref.watch(catalogControllerProvider).value;
     final categories = <String>{
       for (final p in catalogState?.items ?? const <Product>[]) p.category,
+      // Include the current entry's category even if it was pruned from
+      // the catalog — otherwise editing breaks the dropdown.
+      if (_category != null) _category!,
     }.toList()..sort();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('New expense')),
+      appBar: AppBar(title: Text(_isEdit ? 'Edit expense' : 'New expense')),
       body: Form(
         key: _formKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -165,7 +184,11 @@ class _ExpenseFormScreenState extends ConsumerState<ExpenseFormScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.check),
-              label: Text(_submitting ? 'Saving…' : 'Save expense'),
+              label: Text(
+                _submitting
+                    ? 'Saving…'
+                    : (_isEdit ? 'Save changes' : 'Save expense'),
+              ),
               style: FilledButton.styleFrom(
                 minimumSize: const Size.fromHeight(52),
               ),

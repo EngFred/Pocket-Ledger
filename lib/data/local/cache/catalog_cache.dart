@@ -10,9 +10,13 @@ abstract interface class CatalogCache {
 }
 
 class CatalogCacheImpl implements CatalogCache {
-  static const _key = 'products';
   final Box<dynamic> _box;
-  const CatalogCacheImpl(this._box);
+  final int _userId;
+  const CatalogCacheImpl(this._box, {required int userId}) : _userId = userId;
+
+  /// One key per user. User A's cached catalog is invisible to user B,
+  /// and remains on disk so A sees it again when they sign back in.
+  String get _key => 'products.$_userId';
 
   @override
   Future<List<Product>?> read() async {
@@ -24,7 +28,6 @@ class CatalogCacheImpl implements CatalogCache {
           .map((m) => Product.fromJson(m.cast<String, dynamic>()))
           .toList(growable: false);
     } catch (_) {
-      // Corrupted entry — treat as empty rather than crash.
       await _box.delete(_key);
       return null;
     }

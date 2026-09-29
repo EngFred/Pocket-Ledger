@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../di/providers.dart';
+import '../domain/entities/expense_entry.dart';
 import '../presentation/screens/catalog_screen.dart';
 import '../presentation/screens/expense_form_screen.dart';
 import '../presentation/screens/expenses_screen.dart';
@@ -17,6 +18,7 @@ abstract final class Routes {
   static const expenses = 'expenses';
   static const settings = 'settings';
   static const expenseNew = 'expense-new';
+  static const expenseEdit = 'expense-edit';
 
   static const splashPath = '/splash';
   static const loginPath = '/login';
@@ -92,6 +94,15 @@ final routerProvider = Provider<GoRouter>((ref) {
                     name: Routes.expenseNew,
                     builder: (_, __) => const ExpenseFormScreen(),
                   ),
+                  GoRoute(
+                    path: 'edit',
+                    name: Routes.expenseEdit,
+                    builder: (_, state) {
+                      final entry = state.extra as ExpenseEntry?;
+                      if (entry == null) return const _MissingEntryScreen();
+                      return ExpenseFormScreen(initial: entry);
+                    },
+                  ),
                 ],
               ),
             ],
@@ -142,4 +153,16 @@ class _DashboardShell extends StatelessWidget {
       ),
     );
   }
+}
+
+class _MissingEntryScreen extends StatelessWidget {
+  const _MissingEntryScreen();
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(),
+    body: const Center(
+      child: Text('Expense not found. Go back and try again.'),
+    ),
+  );
 }
