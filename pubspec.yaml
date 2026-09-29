@@ -1,0 +1,38 @@
+name: pocket_ledger
+description: "Personal expense tracker on the NSSFGo stack."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  dio: ^5.11.1
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^3.4.3
+  flutter_secure_storage: ^11.2.0
+  freezed_annotation: ^3.1.0
+  go_router: ^18.0.2
+  hive_ce: ^2.20.1
+  hive_ce_flutter: ^2.4.0
+  json_annotation: ^4.12.0
+  path: ^1.9.1
+  path_provider: ^2.1.6
+  retrofit: ^4.10.0
+  riverpod_annotation: ^4.0.7
+  shared_preferences: ^2.5.5
+  sqflite: ^2.4.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.15.1
+  riverpod_generator: ^4.0.9
+  retrofit_generator: ^10.2.9
+  freezed: ^4.0.0-dev.3
+  json_serializable: ^6.14.1
+
+flutter:
+  uses-material-design: true
