@@ -70,8 +70,6 @@ Pocket Ledger lets a user sign in, browse a product catalog, and record personal
   </tr>
 </table>
 
-> **Note for the repo owner:** add the four PNGs to `screenshots/` at the repository root. Recommended dimensions: phone screenshots at native resolution (e.g. 1080 × 2400). The relative paths above resolve as `screenshots/login.png`, `screenshots/catalog.png`, `screenshots/expenses.png`, and `screenshots/settings.png`. Delete this note once the files are in place.
-
 ---
 
 ## Features
