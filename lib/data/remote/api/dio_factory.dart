@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 Dio buildDio() {
   final dio = Dio(
@@ -9,14 +10,20 @@ Dio buildDio() {
       contentType: 'application/json',
     ),
   );
-  dio.interceptors.add(
-    LogInterceptor(
-      request: false,
-      requestHeader: false,
-      responseHeader: false,
-      responseBody: false,
-      error: true,
-    ),
-  );
+
+  if (kDebugMode) {
+    dio.interceptors.add(
+      LogInterceptor(
+        request: true,
+        requestHeader: false, // Authorization header would leak here
+        requestBody: true,
+        responseHeader: false,
+        responseBody: false, // accessToken would leak here
+        error: true, // we want to see failure reasons
+        logPrint: (obj) => debugPrint('[dio] $obj'),
+      ),
+    );
+  }
+
   return dio;
 }

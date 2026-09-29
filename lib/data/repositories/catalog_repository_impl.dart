@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../../core/error/dio_failure_mapper.dart';
 import '../../core/error/failure.dart';
 import '../../core/error/result.dart';
 import '../../domain/entities/product.dart';
@@ -40,30 +41,12 @@ class CatalogRepositoryImpl implements CatalogRepository {
   Future<Result<T>> _run<T>(Future<T> Function() body) async {
     try {
       return Ok(await body());
+    } on DioException catch (e) {
+      return Err(mapDioException(e));
     } on Failure catch (e) {
       return Err(e);
-    } on DioException catch (e) {
-      return Err(_mapDio(e));
     } catch (_) {
       return const Err(UnexpectedFailure());
-    }
-  }
-
-  Failure _mapDio(DioException e) {
-    switch (e.type) {
-      case DioExceptionType.connectionTimeout:
-      case DioExceptionType.receiveTimeout:
-      case DioExceptionType.sendTimeout:
-        return const TimeoutFailure();
-      case DioExceptionType.connectionError:
-        return const NetworkFailure();
-      case DioExceptionType.badResponse:
-        return ServerFailure(
-          'Server error (${e.response?.statusCode}).',
-          e.response?.statusCode,
-        );
-      default:
-        return const UnexpectedFailure();
     }
   }
 }
